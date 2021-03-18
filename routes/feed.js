@@ -6,5 +6,5 @@ const router = express.Router();
 
 router.get("/posts", controllerFeedback.getfeed);
 router.post("/sendPost", validation.feedPost, controllerFeedback.postFeed);
-
+router.get("/post/:postId", controllerFeedback.getPost);
 export default router;

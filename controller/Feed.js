@@ -1,28 +1,29 @@
 import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
 
+function forwardError(err, next) {
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  next(err);
+}
+
 const feed = {
-  getfeed: (req, res) => {
-    const data = {
-      posts: [
-        {
-          _id: "1",
-          title: "Book",
-          content: "This is abook",
-          imageUrl: "asset/img/Pin.png",
-          creator: {
-            name: "kamu",
-          },
-          createdAt: new Date(),
-        },
-      ],
-    };
-    res.status(200).json(data);
+  async getfeed(req, res, next) {
+    try {
+      const data = await postModel.find();
+      res.status(200).json({ posts: data });
+    } catch (err) {
+      forwardError(err, next);
+    }
   },
-  postFeed: async (req, res) => {
+  async postFeed(req, res, next) {
     const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(422).json({ errors: errors.array() });
+    if (!errors.isEmpty()) {
+      const error = new Error("validation failed");
+      error.statusCode = 422;
+      next(error);
+    }
 
     const title = req.body.title;
     const content = req.body.content;
@@ -39,8 +40,23 @@ const feed = {
         message: "Post created succesfully",
         post: savePost,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      forwardError(err, next);
+    }
+  },
+  async getPost(req, res, next) {
+    const postId = req.params.postId;
+
+    try {
+      const dataPost = await postModel.findById(postId);
+      if (!dataPost) {
+        const error = new Error("Could not find post");
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({ message: "success", post: dataPost });
+    } catch (err) {
+      forwardError(err, next);
     }
   },
 };
