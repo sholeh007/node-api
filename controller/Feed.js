@@ -1,4 +1,5 @@
 import { validationResult } from "express-validator";
+import postModel from "../models/postModel.js";
 
 const feed = {
   getfeed: (req, res) => {
@@ -18,24 +19,29 @@ const feed = {
     };
     res.status(200).json(data);
   },
-  postFeed: (req, res) => {
+  postFeed: async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(422).json({ errors: errors.array() });
 
     const title = req.body.title;
     const content = req.body.content;
-
-    res.status(201).json({
-      message: "Post created succesfully",
-      post: {
-        _id: new Date().toString(),
-        title,
-        content,
-        creator: { name: "saya" },
-        createdAt: new Date(),
-      },
+    const post = new postModel({
+      title,
+      content,
+      imageUrl: "asset/img/Ping.png",
+      creator: { name: "saya" },
     });
+
+    try {
+      const savePost = await post.save();
+      res.status(201).json({
+        message: "Post created succesfully",
+        post: savePost,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   },
 };
 
