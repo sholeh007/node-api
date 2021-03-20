@@ -1,3 +1,4 @@
+import fs from "fs/promises";
 import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
 
@@ -20,17 +21,24 @@ const feed = {
   async postFeed(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = new Error("validation failed");
-      error.statusCode = 422;
-      next(error);
+      await fs.unlink(req.file.path);
+      return res.status(422).json({ message: "validation failed" });
+    }
+
+    if (!req.file) {
+      await fs.unlink(req.file.path);
+      return res.status(422).json({ message: "No image provided" });
     }
 
     const title = req.body.title;
     const content = req.body.content;
+    const image = req.file.path.replace(/\\/g, "/");
+    const imageUrl = image.replace("asset/img", "image");
+
     const post = new postModel({
       title,
       content,
-      imageUrl: "asset/img/Ping.png",
+      imageUrl,
       creator: { name: "saya" },
     });
 

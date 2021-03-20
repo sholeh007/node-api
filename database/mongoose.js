@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
+import "dotenv/config.js";
 
-const database = "messages";
-const password = "HJB4YzaElUloBLjk";
-const uri = `mongodb+srv://sholeh:${password}@cluster0.lz5mz.mongodb.net/${database}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.lz5mz.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const connect = async (runServer) => {
   try {
