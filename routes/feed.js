@@ -12,6 +12,10 @@ router.post(
   middleware,
   controllerFeedback.postFeed
 );
-router.get("/post/:postId", controllerFeedback.getPost);
+router
+  .route("/post/:postId")
+  .get(controllerFeedback.getPost)
+  .all(validation.feedPost)
+  .put(controllerFeedback.updatePost);
 
 export default router;

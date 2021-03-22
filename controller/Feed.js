@@ -1,6 +1,8 @@
 import fs from "fs/promises";
+import path from "path";
 import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
+import __dirname from "../helper/path.js";
 
 function forwardError(err, next) {
   if (!err.statusCode) {
@@ -66,6 +68,41 @@ const feed = {
     } catch (err) {
       forwardError(err, next);
     }
+  },
+  async updatePost(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      await fs.unlink(req.file.path);
+      return res.status(422).json({ message: "validation failed" });
+    }
+    const id = req.params.postId;
+    const { title, content } = req.body;
+    let { image } = req.body;
+    let imageUrl;
+
+    if (req.file) {
+      image = req.file.path.replace(/\\/g, "/");
+      imageUrl = image.replace("asset/img", "img");
+    }
+    if (!image) {
+      return res.status(422).json({ message: "no file picked" });
+    }
+
+    const post = await postModel.findById(id);
+
+    if (!post) {
+      return res.status(404).json({ message: "could not find post" });
+    }
+    if (imageUrl !== post.imageUrl) {
+      const imgBeginning = post.imageUrl.replace("image", "asset/img");
+      await fs.unlink(path.join(__dirname, "..", imgBeginning));
+    }
+    post.title = title;
+    post.content = content;
+    post.imageUrl = imageUrl;
+    post.save();
+
+    res.status(200).json({ message: "success", post: post });
   },
 };
 
