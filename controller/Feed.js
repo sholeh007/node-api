@@ -12,11 +12,19 @@ function forwardError(err, next) {
 
 const feed = {
   async getfeed(req, res, next) {
+    const currentPage = req.query.page || 1; // 1 is default
+    const perPage = 3;
+    let totalItems;
     try {
-      const data = await postModel.find();
-      res.status(200).json({ posts: data });
-    } catch (err) {
-      forwardError(err, next);
+      const count = await postModel.estimatedDocumentCount();
+      totalItems = count;
+      const data = await postModel
+        .find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+      res.status(200).json({ posts: data, totalItems });
+    } catch (error) {
+      forwardError(error, next);
     }
   },
   async postFeed(req, res, next) {
