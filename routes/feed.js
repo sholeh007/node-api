@@ -15,6 +15,7 @@ router.post(
 router
   .route("/post/:postId")
   .get(controllerFeedback.getPost)
+  .delete(controllerFeedback.deletePost)
   .all(validation.feedPost)
   .put(controllerFeedback.updatePost);
 

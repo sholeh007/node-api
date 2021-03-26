@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import path from "path";
 import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
 import __dirname from "../helper/path.js";
@@ -97,7 +96,7 @@ const feed = {
       }
       if (imageUrl) {
         const imgBeginning = post.imageUrl.replace("image", "asset/img");
-        await fs.unlink(path.join(__dirname, "..", imgBeginning));
+        await fs.unlink(imgBeginning);
       }
       post.title = title;
       post.content = content;
@@ -107,6 +106,23 @@ const feed = {
       res.status(200).json({ message: "success", post });
     } catch (err) {
       forwardError(err, next);
+    }
+  },
+  async deletePost(req, res, next) {
+    const id = req.params.postId;
+
+    try {
+      const post = await postModel.findById(id);
+
+      if (!post) {
+        return res.status(404).json({ message: "data not found" });
+      }
+      const imageUrl = post.imageUrl.replace("image", "asset/img");
+      await fs.unlink(imageUrl);
+      await postModel.findByIdAndDelete(id);
+      res.status(200).json({ message: "success delete" });
+    } catch (error) {
+      forwardError(error, next);
     }
   },
 };
