@@ -17,7 +17,7 @@ const validation = {
       .normalizeEmail()
       .custom(async (value) => {
         const user = await User.findOne({ email: value });
-        if (!user) {
+        if (user) {
           return Promise.reject("E-mail already is use");
         }
       }),
