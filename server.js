@@ -1,7 +1,8 @@
-import express from "express";
 import "dotenv/config.js";
+import express from "express";
 import cors from "cors";
 import feedRoute from "./routes/feed.js";
+import authRoute from "./routes/auth.js";
 import runServer from "./database/mongoose.js";
 import fileUpload from "./config/fileupload.js";
 
@@ -11,7 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use("/image", express.static("asset/img"));
 app.use(fileUpload);
+
 app.use("/feed", feedRoute);
+app.use("/auth", authRoute);
 
 // error handling
 app.use((error, req, res, next) => {
