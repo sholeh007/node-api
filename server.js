@@ -1,15 +1,15 @@
 import express from "express";
 import "dotenv/config.js";
-import cors from "./config/cors.js";
+import cors from "cors";
 import feedRoute from "./routes/feed.js";
 import runServer from "./database/mongoose.js";
 import fileUpload from "./config/fileupload.js";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use("/image", express.static("asset/img"));
-app.use(cors);
 app.use(fileUpload);
 app.use("/feed", feedRoute);
 

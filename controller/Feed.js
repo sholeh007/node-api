@@ -69,7 +69,7 @@ const feed = {
       forwardError(err, next);
     }
   },
-  async updatePost(req, res) {
+  async updatePost(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       await fs.unlink(req.file.path);
@@ -77,32 +77,37 @@ const feed = {
     }
     const id = req.params.postId;
     const { title, content } = req.body;
-    let { image } = req.body;
+    let image = req.body.image;
     let imageUrl;
 
     if (req.file) {
       image = req.file.path.replace(/\\/g, "/");
-      imageUrl = image.replace("asset/img", "img");
+      imageUrl = image.replace("asset/img", "image");
     }
-    if (!image) {
+
+    if (!imageUrl) {
       return res.status(422).json({ message: "no file picked" });
     }
 
-    const post = await postModel.findById(id);
+    try {
+      const post = await postModel.findById(id);
 
-    if (!post) {
-      return res.status(404).json({ message: "could not find post" });
-    }
-    if (imageUrl !== post.imageUrl) {
-      const imgBeginning = post.imageUrl.replace("image", "asset/img");
-      await fs.unlink(path.join(__dirname, "..", imgBeginning));
-    }
-    post.title = title;
-    post.content = content;
-    post.imageUrl = imageUrl;
-    post.save();
+      if (!post) {
+        return res.status(404).json({ message: "could not find post" });
+      }
+      if (imageUrl) {
+        const imgBeginning = post.imageUrl.replace("image", "asset/img");
+        await fs.unlink(path.join(__dirname, "..", imgBeginning));
+      }
+      post.title = title;
+      post.content = content;
+      post.imageUrl = imageUrl;
+      post.save();
 
-    res.status(200).json({ message: "success", post: post });
+      res.status(200).json({ message: "success", post });
+    } catch (err) {
+      forwardError(err, next);
+    }
   },
 };
 
