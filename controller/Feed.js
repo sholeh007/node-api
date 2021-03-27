@@ -19,6 +19,7 @@ const feed = {
       const count = await postModel.estimatedDocumentCount();
       const data = await postModel
         .find()
+        .populate("creator")
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
       res.status(200).json({ posts: data, totalItems: count });
