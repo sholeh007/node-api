@@ -24,6 +24,7 @@ const validation = {
     check("name").notEmpty().trim(),
     check("password").notEmpty().trim().isLength({ min: 7 }),
   ],
+  status: [check("status", "status empty").notEmpty().trim()],
 };
 
 export default validation;

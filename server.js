@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import feedRoute from "./routes/feed.js";
 import authRoute from "./routes/auth.js";
+import statusRoute from "./routes/status.js";
 import runServer from "./database/mongoose.js";
 import fileUpload from "./config/fileupload.js";
 
@@ -15,6 +16,7 @@ app.use(fileUpload);
 
 app.use("/feed", feedRoute);
 app.use("/auth", authRoute);
+app.use(statusRoute);
 
 // error handling
 app.use((error, req, res, next) => {
