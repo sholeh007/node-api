@@ -106,9 +106,13 @@ const feed = {
 
     try {
       const post = await postModel.findById(id);
-
       if (!post) {
+        await fs.unlink(image);
         return res.status(404).json({ message: "could not find post" });
+      }
+      if (post.creator.toString() !== req.userId) {
+        await fs.unlink(image);
+        return res.status(403).json({ message: "Not Authorized" });
       }
       if (imageUrl) {
         const imgBeginning = post.imageUrl.replace("image", "asset/img");
@@ -118,7 +122,6 @@ const feed = {
       post.content = content;
       post.imageUrl = imageUrl;
       post.save();
-
       res.status(200).json({ message: "success", post });
     } catch (err) {
       forwardError(err, next);
@@ -132,6 +135,9 @@ const feed = {
 
       if (!post) {
         return res.status(404).json({ message: "data not found" });
+      }
+      if (post.creator.toString() !== req.userId) {
+        return res.status(403).json({ message: "Not Authorized" });
       }
       const imageUrl = post.imageUrl.replace("image", "asset/img");
       await fs.unlink(imageUrl);
