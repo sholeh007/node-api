@@ -142,6 +142,10 @@ const feed = {
       const imageUrl = post.imageUrl.replace("image", "asset/img");
       await fs.unlink(imageUrl);
       await postModel.findByIdAndDelete(id);
+      // delete subdoc in user
+      const user = await userModel.findById(req.userId);
+      user.posts.pull(id);
+      await user.save();
       res.status(200).json({ message: "success delete" });
     } catch (error) {
       forwardError(error, next);
