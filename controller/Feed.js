@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
+import userModel from "../models/userModel.js";
 import __dirname from "../helper/path.js";
 
 function forwardError(err, next) {
@@ -39,23 +40,31 @@ const feed = {
       return res.status(422).json({ message: "No image provided" });
     }
 
+    let creator;
     const title = req.body.title;
     const content = req.body.content;
     const image = req.file.path.replace(/\\/g, "/");
     const imageUrl = image.replace("asset/img", "image");
-
     const post = new postModel({
       title,
       content,
       imageUrl,
-      creator: { name: "saya" },
+      creator: req.userId,
     });
 
     try {
       const savePost = await post.save();
+      const user = await userModel.findById(req.userId);
+      creator = user;
+      user.posts.push(post);
+      await user.save();
       res.status(201).json({
         message: "Post created succesfully",
         post: savePost,
+        creator: {
+          _id: creator._id,
+          name: creator.name,
+        },
       });
     } catch (err) {
       forwardError(err, next);
@@ -63,7 +72,6 @@ const feed = {
   },
   async getPost(req, res, next) {
     const postId = req.params.postId;
-
     try {
       const dataPost = await postModel.findById(postId);
       if (!dataPost) {

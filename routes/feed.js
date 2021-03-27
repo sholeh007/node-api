@@ -1,19 +1,22 @@
 import express from "express";
 import controllerFeedback from "../controller/Feed.js";
 import validation from "../helper/validation.js";
-import middleware from "../middleware/file-large.js";
+import fileLarge from "../middleware/file-large.js";
+import isAuth from "../middleware/is-auth.js";
 
 const router = express.Router();
 
-router.get("/posts", controllerFeedback.getfeed);
+router.get("/posts", isAuth, controllerFeedback.getfeed);
 router.post(
   "/sendPost",
+  isAuth,
   validation.feedPost,
-  middleware,
+  fileLarge,
   controllerFeedback.postFeed
 );
 router
   .route("/post/:postId")
+  .all(isAuth)
   .get(controllerFeedback.getPost)
   .delete(controllerFeedback.deletePost)
   .all(validation.feedPost)
