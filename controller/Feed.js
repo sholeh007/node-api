@@ -15,15 +15,13 @@ const feed = {
   async getfeed(req, res, next) {
     const currentPage = req.query.page || 1; // 1 is default
     const perPage = 3;
-    let totalItems;
     try {
       const count = await postModel.estimatedDocumentCount();
-      totalItems = count;
       const data = await postModel
         .find()
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
-      res.status(200).json({ posts: data, totalItems });
+      res.status(200).json({ posts: data, totalItems: count });
     } catch (error) {
       forwardError(error, next);
     }
@@ -40,7 +38,6 @@ const feed = {
       return res.status(422).json({ message: "No image provided" });
     }
 
-    let creator;
     const title = req.body.title;
     const content = req.body.content;
     const image = req.file.path.replace(/\\/g, "/");
@@ -55,15 +52,15 @@ const feed = {
     try {
       const savePost = await post.save();
       const user = await userModel.findById(req.userId);
-      creator = user;
+
       user.posts.push(post);
       await user.save();
       res.status(201).json({
         message: "Post created succesfully",
         post: savePost,
         creator: {
-          _id: creator._id,
-          name: creator.name,
+          _id: user._id,
+          name: user.name,
         },
       });
     } catch (err) {
