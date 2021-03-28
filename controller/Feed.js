@@ -57,7 +57,10 @@ const feed = {
       user.posts.push(post);
       await user.save();
       // socket. event dqn data bisa di custom
-      io.getIo().emit("posts", { action: "create", post });
+      io.getIo().emit("posts", {
+        action: "create",
+        post: { ...post._doc, creator: { _id: req.userId, name: user.name } },
+      });
       res.status(201).json({
         post,
         message: "Post created succesfully",
