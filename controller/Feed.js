@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
 import userModel from "../models/userModel.js";
 import __dirname from "../helper/path.js";
+import io from "../config/socket.js";
 
 function forwardError(err, next) {
   if (!err.statusCode) {
@@ -51,14 +52,15 @@ const feed = {
     });
 
     try {
-      const savePost = await post.save();
+      await post.save();
       const user = await userModel.findById(req.userId);
-
       user.posts.push(post);
       await user.save();
+      // socket. event dqn data bisa di custom
+      io.getIo().emit("posts", { action: "create", post });
       res.status(201).json({
+        post,
         message: "Post created succesfully",
-        post: savePost,
         creator: {
           _id: user._id,
           name: user.name,
