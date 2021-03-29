@@ -152,6 +152,8 @@ const feed = {
       const user = await userModel.findById(req.userId);
       user.posts.pull(id);
       await user.save();
+      // socket
+      io.getIo().emit("posts", { action: "delete", post: id });
       res.status(200).json({ message: "success delete" });
     } catch (error) {
       forwardError(error, next);
