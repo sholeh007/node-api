@@ -20,6 +20,7 @@ const feed = {
       const count = await postModel.estimatedDocumentCount();
       const data = await postModel
         .find()
+        .sort({ createdAt: "desc" })
         .populate("creator")
         .skip((currentPage - 1) * perPage)
         .limit(perPage);
