@@ -1,10 +1,3 @@
-const root = {
-  hello() {
-    return {
-      text: "Hello World",
-      views: 5,
-    };
-  },
-};
+const root = {};
 
 export default root;
