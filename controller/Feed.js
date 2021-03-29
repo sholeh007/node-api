@@ -3,7 +3,6 @@ import { validationResult } from "express-validator";
 import postModel from "../models/postModel.js";
 import userModel from "../models/userModel.js";
 import __dirname from "../helper/path.js";
-import io from "../config/socket.js";
 
 function forwardError(err, next) {
   if (!err.statusCode) {
@@ -57,11 +56,6 @@ const feed = {
       const user = await userModel.findById(req.userId);
       user.posts.push(post);
       await user.save();
-      // socket. event dqn data bisa di custom
-      io.getIo().emit("posts", {
-        action: "create",
-        post: { ...post._doc, creator: { _id: req.userId, name: user.name } },
-      });
       res.status(201).json({
         post,
         message: "Post created succesfully",
@@ -126,8 +120,6 @@ const feed = {
       post.content = content;
       post.imageUrl = imageUrl;
       post.save();
-      //socket
-      io.getIo().emit("posts", { action: "update", post });
       res.status(200).json({ message: "success", post });
     } catch (err) {
       forwardError(err, next);
@@ -152,8 +144,6 @@ const feed = {
       const user = await userModel.findById(req.userId);
       user.posts.pull(id);
       await user.save();
-      // socket
-      io.getIo().emit("posts", { action: "delete", post: id });
       res.status(200).json({ message: "success delete" });
     } catch (error) {
       forwardError(error, next);
