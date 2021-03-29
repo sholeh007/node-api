@@ -108,12 +108,12 @@ const feed = {
     }
 
     try {
-      const post = await postModel.findById(id);
+      const post = await (await postModel.findById(id)).populate("creator");
       if (!post) {
         await fs.unlink(image);
         return res.status(404).json({ message: "could not find post" });
       }
-      if (post.creator.toString() !== req.userId) {
+      if (post.creator._id.toString() !== req.userId) {
         await fs.unlink(image);
         return res.status(403).json({ message: "Not Authorized" });
       }
@@ -125,6 +125,8 @@ const feed = {
       post.content = content;
       post.imageUrl = imageUrl;
       post.save();
+      //socket
+      io.getIo().emit("posts", { action: "update", post });
       res.status(200).json({ message: "success", post });
     } catch (err) {
       forwardError(err, next);
