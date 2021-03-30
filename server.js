@@ -1,4 +1,3 @@
-import "dotenv/config.js";
 import express from "express";
 import cors from "cors";
 import feedRoute from "./routes/feed.js";
@@ -26,4 +25,4 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message });
 });
 
-runServer(app.listen(process.env.APP_PORT));
+runServer(app.listen(process.env.PORT));
