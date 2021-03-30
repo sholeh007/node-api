@@ -5,6 +5,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
+    "test": "mocha",
     "dev": "nodemon -r dotenv/config server.js"
   },
   "keywords": [],
