@@ -10,7 +10,7 @@ const decode = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   let decodeToken;
   try {
-    decodeToken = jwt.verify(token, "somesupersecret");
+    decodeToken = jwt.verify(token, process.env.KEY_JWT);
   } catch (err) {
     err.statusCode = 500;
     throw err;

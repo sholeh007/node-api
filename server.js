@@ -25,4 +25,4 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message });
 });
 
-runServer(app.listen(process.env.PORT));
+runServer(app.listen(process.env.PORT || 3000));

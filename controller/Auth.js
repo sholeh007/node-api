@@ -38,7 +38,7 @@ const Auth = {
 
       const token = jwt.sign(
         { email: user.email, id: user._id.toString() },
-        "somesupersecret",
+        process.env.KEY_JWT,
         { expiresIn: "1h" }
       );
       res.status(200).json({ token, userId: user._id.toString() });
