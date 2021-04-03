@@ -109,7 +109,7 @@ const feed = {
     }
 
     try {
-      const post = await (await postModel.findById(id)).populate("creator");
+      const post = await postModel.findById(id).populate("creator");
       if (!post) {
         await fs.unlink(image);
         return res.status(404).json({ message: "could not find post" });
