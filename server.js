@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
+import swaggerUI from "swagger-ui-express";
 import feedRoute from "./routes/feed.js";
 import authRoute from "./routes/auth.js";
 import statusRoute from "./routes/status.js";
 import runServer from "./database/mongoose.js";
 import fileUpload from "./config/fileupload.js";
+import swaggerSpec from "./docs/swagger-js-doc.js";
 
 const app = express();
 
@@ -13,6 +15,7 @@ app.use(express.json());
 app.use("/image", express.static("asset/img"));
 app.use(fileUpload);
 
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use("/feed", feedRoute);
 app.use("/auth", authRoute);
 app.use(statusRoute);
