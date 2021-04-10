@@ -15,7 +15,11 @@ app.use(express.json());
 app.use("/image", express.static("asset/img"));
 app.use(fileUpload);
 
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use(
+  "/api-docs",
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerSpec, { explorer: true })
+);
 app.use("/feed", feedRoute);
 app.use("/auth", authRoute);
 app.use(statusRoute);
